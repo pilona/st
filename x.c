@@ -1992,6 +1992,55 @@ main(int argc, char *argv[])
 	case 'c':
 		opt_class = EARGF(usage());
 		break;
+	case 'C': {
+		char* opt_colour = EARGF(usage());
+		struct {
+			char* name;
+			int index;
+		} map[] = {
+			/* WARNING: intentional aliasing */
+			{ "bg", defaultbg },
+			{ "fg", defaultfg },
+			{ "cs", defaultcs },
+
+			{ "it", defaultitalic },
+			{ "ul", defaultunderline },
+
+			/* default colours */
+			{ "black",       0,  },
+			{ "red",         1,  },
+			{ "green",       2,  },
+			{ "yellow",      3,  },
+			{ "blue",        4,  },
+			{ "magenta",     5,  },
+			{ "cyan",        6,  },
+			{ "gray",        7,  },
+			{ "boldblack",   8,  },
+			{ "boldred",     9,  },
+			{ "boldgreen",   10, },
+			{ "boldyellow",  11, },
+			{ "boldblue",    12, },
+			{ "boldmagenta", 13, },
+			{ "boldcyan",    14, },
+			{ "boldgray",    15, },
+		};
+		char* colon = strchr(opt_colour, ':');
+		if(!colon)
+			usage();
+		for(int i=0; i<LEN(map); i++)
+			if(!strncmp(map[i].name, opt_colour, colon-opt_colour)) {
+				colorname[map[i].index] = colon+1;
+				goto kludge;
+			}
+		char* endptr;
+		int number = strtoul(opt_colour, &endptr, 0);
+		if(endptr < colon || number > LEN(colorname))
+			usage();
+		else
+			colorname[number] = colon+1;
+kludge:
+		break;
+	}
 	case 'e':
 		if (argc > 0)
 			--argc, ++argv;
