@@ -1,5 +1,5 @@
 # st version
-VERSION = 0.8.3
+VERSION = $(shell git describe --long --tags --abbrev --dirty)
 
 # Customize below to fit your system
 
