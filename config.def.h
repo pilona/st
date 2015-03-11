@@ -1,3 +1,4 @@
+// vim: noet ts=8 sts=8 sw=8
 /* See LICENSE file for copyright and license details. */
 
 /*

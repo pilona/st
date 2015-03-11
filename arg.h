@@ -1,3 +1,4 @@
+// vim: noet ts=8 sts=8 sw=8
 /*
  * Copy me if you can.
  * by 20h
