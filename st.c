@@ -1,3 +1,4 @@
+// vim: noet ts=8 sts=8 sw=8
 /* See LICENSE for license details. */
 #include <ctype.h>
 #include <errno.h>
