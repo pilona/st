@@ -26,3 +26,6 @@ misc
 
     $ grep -nE 'XXX|TODO' st.c
 
+Increase font size to next available, not by just 1 pt/px.
+Don't truncate upon horizontal downsize?
+Reflow upon horizontal resize?
