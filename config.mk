@@ -18,8 +18,13 @@ LIBS = -lm -lrt -lX11 -lutil -lXft \
 
 # flags
 STCPPFLAGS = -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600
+STCPPFLAGS += -D_FORTIFY_SOURCE=2
 STCFLAGS = $(INCS) $(STCPPFLAGS) $(CPPFLAGS) $(CFLAGS)
+STCFLAGS += -pedantic -Wall -Wvariadic-macros
+STCFLAGS += -fstack-protector-strong --param ssp-buffer-size=4 -fno-plt
+STCFLAGS += -fPIE
 STLDFLAGS = $(LIBS) $(LDFLAGS)
+STLDFLAGS += -z relro -z now -pie
 
 # OpenBSD:
 #CPPFLAGS = -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600 -D_BSD_SOURCE
