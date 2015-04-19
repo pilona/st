@@ -1,0 +1,35 @@
+#! /bin/sh
+
+# Colour palette from https://github.com/thayerwilliams/vimbrant/blob/master/.Xdefaults.c.vimbrant
+
+# These four are defined upstream, but overridden by the ones chosen in
+# this script.
+#*color6:    #465457
+#*color14:   #899ca1
+#*color7:    #ccccc6
+#*color15:   #f8f8f2
+#*color7:    #bfbfba
+#*color15:   #ebebe5
+
+st -C "0:#1b1d1e" \
+   -C "1:#f92672" \
+   -C "2:#82b414" \
+   -C "3:#fd971f" \
+   -C "4:#56c2d6" \
+   -C "5:#8c54fe" \
+   -C "6:#56676b" \
+   -C "7:#aaaaaa" \
+   \
+   -C "8:#505354" \
+   -C "9:#ff5995" \
+   -C "10:#b6e354" \
+   -C "11:#feed6c" \
+   -C "12:#8cedff" \
+   -C "13:#9e6ffe" \
+   -C "14:#899ca1" \
+   -C "15:#ffffff" \
+   \
+   -C "fg:#a0a0a0" \
+   -C "bg:#1b1d1e" \
+   -C "cs:#fd971f" \
+   "$@"
