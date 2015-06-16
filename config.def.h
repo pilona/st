@@ -21,6 +21,8 @@ char *utmp = NULL;
 /* scroll program: to enable use a string like "scroll" */
 char *scroll = NULL;
 char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
+int persistentclip = 1;
+char *clip = "xclip -selection clipboard";
 
 /* identification sequence returned in DA and DECID */
 char *vtiden = "\033[?6c";

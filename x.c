@@ -262,7 +262,21 @@ clipcopy(const Arg *dummy)
 	free(xsel.clipboard);
 	xsel.clipboard = NULL;
 
-	if (xsel.primary != NULL) {
+	if (xsel.primary == NULL)
+		return;
+
+    if (persistentclip) {
+		/* TODO: Something cleaner. */
+		/* FIXME: Causes "Couldn't read from shell"s? */
+		FILE* clippipe = popen(clip, "w");
+		if (clippipe == NULL) {
+			perror("Couldn't start persistent clipboard");
+			return;
+		}
+		if (fputs(xsel.primary, clippipe) < 0)
+			perror("Couldn't copy to persistent clipboard");
+		pclose(clippipe);
+    } else {
 		xsel.clipboard = xstrdup(xsel.primary);
 		clipboard = XInternAtom(xw.dpy, "CLIPBOARD", 0);
 		XSetSelectionOwner(xw.dpy, clipboard, xw.win, CurrentTime);
