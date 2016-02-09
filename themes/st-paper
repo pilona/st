@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# Colour palette from https://www.reddit.com/r/vim/comments/36xzbs/vim_paper_color_theme_inspired_by_googles/
+
+# TODO? Cursor colour
+
+st -C '0:#EDEDED' \
+   -C '1:#D7005F' \
+   -C '2:#718C00' \
+   -C '3:#D75F00' \
+   -C '4:#4271AE' \
+   -C '5:#8959A8' \
+   -C '6:#3E999F' \
+   -C '7:#4D4D4C' \
+   \
+   -C '8:#969694' \
+   -C '9:#D7005F' \
+   -C '10:#718C00' \
+   -C '11:#D75F00' \
+   -C '12:#4271AE' \
+   -C '13:#8959A8' \
+   -C '14:#3E999F' \
+   -C '15:#F5F5F5' \
+   \
+   -C 'bg:#EEEEEE' \
+   -C 'fg:#4D4D4C' \
+   \
+   "$@"
