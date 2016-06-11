@@ -1,0 +1,27 @@
+#! /bin/sh
+
+exec st -C '0:#000d18' \
+        -C '1:#e89393' \
+        -C '2:#9ece9e' \
+        -C '3:#f0dfaf' \
+        -C '4:#8cd0d3' \
+        -C '5:#c0bed1' \
+        -C '6:#dfaf8f' \
+        -C '7:#efefef' \
+        \
+        -C '8:#000d18' \
+        -C '9:#e89393' \
+        -C '10:#9ece9e' \
+        -C '11:#f0dfaf' \
+        -C '12:#8cd0d3' \
+        -C '13:#c0bed1' \
+        -C '14:#dfaf8f' \
+        -C '15:#efefef' \
+        \
+        -C 'ul:#ccdc90' \
+        -C 'it:#80d4aa' \
+        \
+        -C 'fg:#dcdccc' \
+        -C 'bg:#1f1f1f' \
+        -C 'cs:#8faf9f' \
+#-C BD       #ffcfaf
