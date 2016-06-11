@@ -161,6 +161,199 @@ static const unsigned int mousebg = defaultfg;
  */
 static unsigned int defaultattr = 11;
 
+struct {
+	char* theme;
+	char *colorname[sizeof(colorname)/sizeof(*colorname)];
+}
+static const color_schemes[] = {
+	{
+		.theme = "atelierdune",
+		.colorname = {
+			"#20201d",
+			"#d73737",
+			"#60ac39",
+			"#cfb017",
+			"#6684e1",
+			"#b854d4",
+			"#1fad83",
+			"#a6a28c",
+
+			"#7d7a68",
+			"#d73737",
+			"#60ac39",
+			"#cfb017",
+			"#6684e1",
+			"#b854d4",
+			"#1fad83",
+			"#fefbec",
+
+			"#b65611",
+			"#d43552",
+			"#292824",
+			"#6e6b5e",
+			"#999580",
+			"#e8e4cf",
+
+			[defaultfg] = "#a6a28c",
+			[defaultbg] = "#20201d",
+			[defaultcs] = "#a6a28c",
+		},
+	},
+	{
+		.theme = "monokai",
+		.colorname = {
+			"#272822",
+			"#f92672",
+			"#a6e22e",
+			"#f4bf75",
+			"#66d9ef",
+			"#ae81ff",
+			"#a1efe4",
+			"#f8f8f2",
+
+			"#75715e",
+			"#f92672",
+			"#a6e22e",
+			"#f4bf75",
+			"#66d9ef",
+			"#ae81ff",
+			"#a1efe4",
+			"#f9f8f5",
+
+			"#fd971f",
+			"#cc6633",
+			"#383830",
+			"#49483e",
+			"#a59f85",
+			"#f5f4f1",
+
+			[defaultfg] = "#f8f8f2",
+			[defaultbg] = "#272822",
+			[defaultcs] = "#f8f8f2",
+		},
+	},
+	{
+		.theme = "paper",
+		.colorname = {
+			"#EDEDED",
+			"#D7005F",
+			"#718C00",
+			"#D75F00",
+			"#4271AE",
+			"#8959A8",
+			"#3E999F",
+			"#4D4D4C",
+
+			"#969694",
+			"#D7005F",
+			"#718C00",
+			"#D75F00",
+			"#4271AE",
+			"#8959A8",
+			"#3E999F",
+			"#F5F5F5",
+
+			[defaultbg] = "#EEEEEE",
+			[defaultfg] = "#4D4D4C",
+		},
+	},
+	{
+		.theme = "solarized",
+		.colorname = {
+			"#073642",
+			"#dc322f",
+			"#859900",
+			"#b58900",
+			"#268bd2",
+			"#d33682",
+			"#2aa198",
+			"#eee8d5",
+
+			"#002b36",
+			"#cb4b16",
+			"#586e75",
+			"#657b83",
+			"#839496",
+			"#6c71c4",
+			"#93a1a1",
+			"#fdf6e3",
+
+			[defaultbg] = "#002b36",
+			[defaultfg] = "#839496",
+			[defaultcs] = "#93a1a1",
+		},
+	},
+	{
+		.theme = "vimbrant",
+		.colorname = {
+			"#1b1d1e",
+			"#f92672",
+			"#82b414",
+			"#fd971f",
+			"#56c2d6",
+			"#8c54fe",
+			"#56676b",
+			"#aaaaaa",
+
+			"#505354",
+			"#ff5995",
+			"#b6e354",
+			"#feed6c",
+			"#8cedff",
+			"#9e6ffe",
+			"#899ca1",
+			"#ffffff",
+
+			[defaultfg] = "#a0a0a0",
+			[defaultbg] = "#1b1d1e",
+			[defaultcs] = "#fd971f",
+		},
+	},
+	{
+		.theme = "zenburn",
+		.colorname = {
+			"#000d18",
+			"#e89393",
+			"#9ece9e",
+			"#f0dfaf",
+			"#8cd0d3",
+			"#c0bed1",
+			"#dfaf8f",
+			"#efefef",
+
+			"#000d18",
+			"#e89393",
+			"#9ece9e",
+			"#f0dfaf",
+			"#8cd0d3",
+			"#c0bed1",
+			"#dfaf8f",
+			"#efefef",
+
+			[defaultunderline] = "#ccdc90",
+			[defaultitalic] = "#80d4aa",
+
+			[defaultfg] = "#dcdccc",
+			[defaultbg] = "#1f1f1f",
+			[defaultcs] = "#8faf9f",
+		},
+	},
+};
+static const char* default_colorname = NULL /* "zenburn", "monokai", etc. */;
+
+static int apply_color_scheme(const char* opt_colour) {
+	if (!opt_colour)
+		return 0;
+	for (int i=0; i<LEN(color_schemes); i++)
+		if (!strcmp(color_schemes[i].theme, opt_colour)) {
+			for (int c=0; c<LEN(color_schemes[i].colorname); c++)
+				if (color_schemes[i].colorname[c])
+					colorname[c] = color_schemes[i].colorname[c];
+			return 1;
+		}
+	return 0;
+}
+
 /*
  * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
  * Note that if you want to use ShiftMask with selmasks, set this to an other
