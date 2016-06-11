@@ -54,6 +54,6 @@ install: st
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/st
 	rm -f $(DESTDIR)$(MANPREFIX)/man1/st.1
-	rm -f ${DESTDIR}${PREFIX}/bin/st-solarized
+	cd themes; for theme in *; do rm -f ${DESTDIR}${PREFIX}/bin/$$theme; done
 
 .PHONY: all options clean dist install uninstall
