@@ -2105,19 +2105,22 @@ kludge:
 			{ "boldgray",    15, },
 		};
 		char* colon = strchr(opt_colour, ':');
-		if(!colon)
-			usage();
-		for(int i=0; i<LEN(map); i++)
-			if(!strncmp(map[i].name, opt_colour, colon-opt_colour)) {
-				colorname[map[i].index] = colon+1;
-				goto kludge;
-			}
-		char* endptr;
-		int number = strtoul(opt_colour, &endptr, 0);
-		if(endptr < colon || number > LEN(colorname))
-			usage();
-		else
-			colorname[number] = colon+1;
+		if(!colon) {
+			if (!apply_color_scheme(opt_colour))
+				usage();
+		} else {
+			for(int i=0; i<LEN(map); i++)
+				if(!strncmp(map[i].name, opt_colour, colon-opt_colour)) {
+					colorname[map[i].index] = colon+1;
+					goto kludge;
+				}
+			char* endptr;
+			int number = strtoul(opt_colour, &endptr, 0);
+			if(endptr < colon || number > LEN(colorname))
+				usage();
+			else
+				colorname[number] = colon+1;
+		}
 kludge:
 		break;
 	}
@@ -2143,6 +2146,7 @@ run:
 	xinit(cols, rows);
 	xsetenv();
 	selinit();
+	apply_color_scheme(default_colorname);
 	run();
 
 	return 0;
