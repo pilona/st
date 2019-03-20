@@ -254,6 +254,7 @@ static const color_schemes[] = {
 
 			[defaultfg] = "#4D4D4C",
 			[defaultbg] = "#EEEEEE",
+			[defaultcs] = "#878787",
 		},
 	},
 	{
