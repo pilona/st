@@ -111,11 +111,14 @@ static char *colorname[] = {
 	"cyan",
 	"white",
 
-	[255] = 0,
+	[255] = NULL,
 
 	/* more colors can be added after 255 to use with DefaultXX */
 	"#cccccc",
 	"#555555",
+
+    "black",
+    "gray90",
 };
 
 
@@ -123,10 +126,10 @@ static char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 7;
-unsigned int defaultbg = 0;
-static unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+const unsigned int defaultfg = 258;
+const unsigned int defaultbg = 259;
+static const unsigned int defaultcs = 256;
+static const unsigned int defaultrcs = 257;
 
 /*
  * Default shape of cursor
@@ -249,8 +252,8 @@ static const color_schemes[] = {
 			"#3E999F",
 			"#F5F5F5",
 
-			[defaultbg] = "#EEEEEE",
 			[defaultfg] = "#4D4D4C",
+			[defaultbg] = "#EEEEEE",
 		},
 	},
 	{
@@ -274,8 +277,8 @@ static const color_schemes[] = {
 			"#93a1a1",
 			"#fdf6e3",
 
-			[defaultbg] = "#002b36",
 			[defaultfg] = "#839496",
+			[defaultbg] = "#002b36",
 			[defaultcs] = "#93a1a1",
 		},
 	},
@@ -326,8 +329,8 @@ static const color_schemes[] = {
 			"#dfaf8f",
 			"#efefef",
 
-			[defaultunderline] = "#ccdc90",
-			[defaultitalic] = "#80d4aa",
+			/* [defaultunderline] = "#ccdc90",
+			[defaultitalic] = "#80d4aa", */
 
 			[defaultfg] = "#dcdccc",
 			[defaultbg] = "#1f1f1f",
