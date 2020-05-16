@@ -214,8 +214,8 @@ static const color_schemes[] = {
 			"#a1efe4",
 			"#f8f8f2",
 
-			"#f92672",
 			"#75715e",
+			"#f92672",
 			"#a6e22e",
 			"#f4bf75",
 			"#66d9ef",
