@@ -117,12 +117,10 @@ static char *colorname[] = {
 	[255] = NULL,
 
 	/* more colors can be added after 255 to use with DefaultXX */
-	"white",
-	"black",
-	"green",
-	"#555555",
-	"black",
-	"gray90",
+	"white", /* defaultcs */
+	"black", /* defaultrcs */
+	"black", /* defaultfg */
+	"gray90", /* defaultbg */
 };
 
 
