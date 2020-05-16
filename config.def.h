@@ -130,10 +130,12 @@ static char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-const unsigned int defaultfg = 258;
-const unsigned int defaultbg = 259;
-static const unsigned int defaultcs = 256;
-static const unsigned int defaultrcs = 257;
+const unsigned int defaultfg = 258; /* for use in st.h */
+const unsigned int defaultbg = 259; /* for use in st.h */
+#define defaultfg 258 /* shut up compiler about non-literal array initializer index */
+#define defaultbg 259 /* shut up compiler about non-literal array initializer index */
+#define defaultcs 256
+#define defaultrcs 257
 
 /*
  * Default shape of cursor
