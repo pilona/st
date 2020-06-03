@@ -2033,8 +2033,8 @@ main(int argc, char *argv[])
 			{ "cs", defaultcs },
 			{ "rcs", defaultrcs },
 
-			{ "it", defaultitalic },
-			{ "ul", defaultunderline },
+			/*{ "it", defaultitalic },
+			{ "ul", defaultunderline },*/
 
 			/* default colours */
 			{ "black",       0,  },

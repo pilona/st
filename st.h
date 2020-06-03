@@ -121,5 +121,5 @@ extern int allowaltscreen;
 extern int allowwindowops;
 extern char *termname;
 extern unsigned int tabspaces;
-extern unsigned int defaultfg;
-extern unsigned int defaultbg;
+extern const unsigned int defaultfg;
+extern const unsigned int defaultbg;
