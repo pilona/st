@@ -22,6 +22,8 @@ char *utmp = NULL;
 /* scroll program: to enable use a string like "scroll" */
 char *scroll = NULL;
 char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
+int persistentclip = 1;
+char *clip = "xclip -selection clipboard";
 
 /* identification sequence returned in DA and DECID */
 char *vtiden = "\033[?6c";
@@ -95,7 +97,7 @@ char *termname = "st-256color";
 unsigned int tabspaces = 8;
 
 /* Terminal colors (16 first used in escape sequence) */
-static const char *colorname[] = {
+static char *colorname[] = {
 	/* 8 normal colors */
 	"black",
 	"red3",
@@ -116,15 +118,13 @@ static const char *colorname[] = {
 	"cyan",
 	"white",
 
-	[255] = 0,
+	[255] = NULL,
 
 	/* more colors can be added after 255 to use with DefaultXX */
-	"white",
-	"black",
-	"green",
-	"#555555",
-	"yellow",
-	"gray50"
+	"white", /* defaultcs */
+	"black", /* defaultrcs */
+	"black", /* defaultfg */
+	"gray90", /* defaultbg */
 };
 
 
@@ -132,10 +132,12 @@ static const char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 7;
-unsigned int defaultbg = 0;
-static unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+const unsigned int defaultfg = 258; /* for use in st.h */
+const unsigned int defaultbg = 259; /* for use in st.h */
+#define defaultfg 258 /* shut up compiler about non-literal array initializer index */
+#define defaultbg 259 /* shut up compiler about non-literal array initializer index */
+#define defaultcs 256
+#define defaultrcs 257
 
 /*
  * Default shape of cursor
@@ -157,14 +159,208 @@ static unsigned int rows = 24;
  * Default colour and shape of the mouse cursor
  */
 static unsigned int mouseshape = XC_xterm;
-static unsigned int mousefg = 7;
-static unsigned int mousebg = 0;
+static const unsigned int mousefg = defaultbg;
+static const unsigned int mousebg = defaultfg;
 
 /*
  * Color used to display font attributes when fontconfig selected a font which
  * doesn't match the ones requested.
  */
 static unsigned int defaultattr = 11;
+
+struct {
+	char* theme;
+	char *colorname[sizeof(colorname)/sizeof(*colorname)];
+}
+static const color_schemes[] = {
+	{
+		.theme = "atelierdune",
+		.colorname = {
+			"#20201d",
+			"#d73737",
+			"#60ac39",
+			"#cfb017",
+			"#6684e1",
+			"#b854d4",
+			"#1fad83",
+			"#a6a28c",
+
+			"#7d7a68",
+			"#d73737",
+			"#60ac39",
+			"#cfb017",
+			"#6684e1",
+			"#b854d4",
+			"#1fad83",
+			"#fefbec",
+
+			"#b65611",
+			"#d43552",
+			"#292824",
+			"#6e6b5e",
+			"#999580",
+			"#e8e4cf",
+
+			[defaultfg] = "#a6a28c",
+			[defaultbg] = "#20201d",
+			[defaultcs] = "#a6a28c",
+		},
+	},
+	{
+		.theme = "monokai",
+		.colorname = {
+			"#272822",
+			"#f92672",
+			"#a6e22e",
+			"#f4bf75",
+			"#66d9ef",
+			"#ae81ff",
+			"#a1efe4",
+			"#f8f8f2",
+
+			"#75715e",
+			"#f92672",
+			"#a6e22e",
+			"#f4bf75",
+			"#66d9ef",
+			"#ae81ff",
+			"#a1efe4",
+			"#f9f8f5",
+
+			"#fd971f",
+			"#cc6633",
+			"#383830",
+			"#49483e",
+			"#a59f85",
+			"#f5f4f1",
+
+			[defaultfg] = "#f8f8f2",
+			[defaultbg] = "#272822",
+			[defaultcs] = "#f8f8f2",
+		},
+	},
+	{
+		.theme = "paper",
+		.colorname = {
+			"#EDEDED",
+			"#D7005F",
+			"#718C00",
+			"#D75F00",
+			"#4271AE",
+			"#8959A8",
+			"#3E999F",
+			"#4D4D4C",
+
+			"#969694",
+			"#D7005F",
+			"#718C00",
+			"#D75F00",
+			"#4271AE",
+			"#8959A8",
+			"#3E999F",
+			"#F5F5F5",
+
+			[defaultfg] = "#4D4D4C",
+			[defaultbg] = "#EEEEEE",
+			[defaultcs] = "#878787",
+		},
+	},
+	{
+		.theme = "solarized",
+		.colorname = {
+			"#073642",
+			"#dc322f",
+			"#859900",
+			"#b58900",
+			"#268bd2",
+			"#d33682",
+			"#2aa198",
+			"#eee8d5",
+
+			"#002b36",
+			"#cb4b16",
+			"#586e75",
+			"#657b83",
+			"#839496",
+			"#6c71c4",
+			"#93a1a1",
+			"#fdf6e3",
+
+			[defaultfg] = "#839496",
+			[defaultbg] = "#002b36",
+			[defaultcs] = "#93a1a1",
+		},
+	},
+	{
+		.theme = "vimbrant",
+		.colorname = {
+			"#1b1d1e",
+			"#f92672",
+			"#82b414",
+			"#fd971f",
+			"#56c2d6",
+			"#8c54fe",
+			"#56676b",
+			"#aaaaaa",
+
+			"#505354",
+			"#ff5995",
+			"#b6e354",
+			"#feed6c",
+			"#8cedff",
+			"#9e6ffe",
+			"#899ca1",
+			"#ffffff",
+
+			[defaultfg] = "#a0a0a0",
+			[defaultbg] = "#1b1d1e",
+			[defaultcs] = "#fd971f",
+		},
+	},
+	{
+		.theme = "zenburn",
+		.colorname = {
+			"#000d18",
+			"#e89393",
+			"#9ece9e",
+			"#f0dfaf",
+			"#8cd0d3",
+			"#c0bed1",
+			"#dfaf8f",
+			"#efefef",
+
+			"#000d18",
+			"#e89393",
+			"#9ece9e",
+			"#f0dfaf",
+			"#8cd0d3",
+			"#c0bed1",
+			"#dfaf8f",
+			"#efefef",
+
+			/* [defaultunderline] = "#ccdc90",
+			[defaultitalic] = "#80d4aa", */
+
+			[defaultfg] = "#dcdccc",
+			[defaultbg] = "#1f1f1f",
+			[defaultcs] = "#8faf9f",
+		},
+	},
+};
+static const char* default_colorname = NULL /* "zenburn", "monokai", etc. */;
+
+static int apply_color_scheme(const char* opt_colour) {
+	if (!opt_colour)
+		return 0;
+	for (int i=0; i<LEN(color_schemes); i++)
+		if (!strcmp(color_schemes[i].theme, opt_colour)) {
+			for (int c=0; c<LEN(color_schemes[i].colorname); c++)
+				if (color_schemes[i].colorname[c])
+					colorname[c] = color_schemes[i].colorname[c];
+			return 1;
+		}
+	return 0;
+}
 
 /*
  * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
@@ -179,6 +375,8 @@ static uint forcemousemod = ShiftMask;
  */
 static MouseShortcut mshortcuts[] = {
 	/* mask                 button   function        argument       release */
+	{ ShiftMask,            Button4, kscrollup,      {.i = 1} },
+	{ ShiftMask,            Button5, kscrolldown,    {.i = 1} },
 	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
 	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
@@ -204,6 +402,8 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
 /*

@@ -103,6 +103,11 @@ typedef struct {
 	Draw draw;
 	Visual *vis;
 	XSetWindowAttributes attrs;
+	/* Here, we use the term *pointer* to differentiate the cursor
+	 * one sees when hovering the mouse over the terminal from, e.g.,
+	 * a green rectangle where text would be entered. */
+	Cursor vpointer, bpointer; /* visible and hidden pointers */
+	int pointerisvisible;
 	int scr;
 	int isfixed; /* is fixed geometry? */
 	int l, t; /* left and top offset */
@@ -262,7 +267,21 @@ clipcopy(const Arg *dummy)
 	free(xsel.clipboard);
 	xsel.clipboard = NULL;
 
-	if (xsel.primary != NULL) {
+	if (xsel.primary == NULL)
+		return;
+
+    if (persistentclip) {
+		/* TODO: Something cleaner. */
+		/* FIXME: Causes "Couldn't read from shell"s? */
+		FILE* clippipe = popen(clip, "w");
+		if (clippipe == NULL) {
+			perror("Couldn't start persistent clipboard");
+			return;
+		}
+		if (fputs(xsel.primary, clippipe) < 0)
+			perror("Couldn't copy to persistent clipboard");
+		pclose(clippipe);
+    } else {
 		xsel.clipboard = xstrdup(xsel.primary);
 		clipboard = XInternAtom(xw.dpy, "CLIPBOARD", 0);
 		XSetSelectionOwner(xw.dpy, clipboard, xw.win, CurrentTime);
@@ -698,6 +717,13 @@ brelease(XEvent *e)
 void
 bmotion(XEvent *e)
 {
+	if (!xw.pointerisvisible) {
+		XDefineCursor(xw.dpy, xw.win, xw.vpointer);
+		xw.pointerisvisible = 1;
+		if (!IS_SET(MODE_MOUSEMANY))
+			xsetpointermotion(0);
+	}
+
 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forcemousemod)) {
 		mousereport(e);
 		return;
@@ -1099,10 +1125,10 @@ void
 xinit(int cols, int rows)
 {
 	XGCValues gcvalues;
-	Cursor cursor;
 	Window parent;
 	pid_t thispid = getpid();
 	XColor xmousefg, xmousebg;
+	Pixmap blankpm;
 
 	if (!(xw.dpy = XOpenDisplay(NULL)))
 		die("can't open display\n");
@@ -1166,8 +1192,9 @@ xinit(int cols, int rows)
 	}
 
 	/* white cursor, black outline */
-	cursor = XCreateFontCursor(xw.dpy, mouseshape);
-	XDefineCursor(xw.dpy, xw.win, cursor);
+	xw.pointerisvisible = 1;
+	xw.vpointer = XCreateFontCursor(xw.dpy, mouseshape);
+	XDefineCursor(xw.dpy, xw.win, xw.vpointer);
 
 	if (XParseColor(xw.dpy, xw.cmap, colorname[mousefg], &xmousefg) == 0) {
 		xmousefg.red   = 0xffff;
@@ -1181,7 +1208,10 @@ xinit(int cols, int rows)
 		xmousebg.blue  = 0x0000;
 	}
 
-	XRecolorCursor(xw.dpy, cursor, &xmousefg, &xmousebg);
+	XRecolorCursor(xw.dpy, xw.vpointer, &xmousefg, &xmousebg);
+	blankpm = XCreateBitmapFromData(xw.dpy, xw.win, &(char){0}, 1, 1);
+	xw.bpointer = XCreatePixmapCursor(xw.dpy, blankpm, blankpm,
+					  &xmousefg, &xmousebg, 0, 0);
 
 	xw.xembed = XInternAtom(xw.dpy, "_XEMBED", False);
 	xw.wmdeletewin = XInternAtom(xw.dpy, "WM_DELETE_WINDOW", False);
@@ -1674,6 +1704,8 @@ unmap(XEvent *ev)
 void
 xsetpointermotion(int set)
 {
+	if (!set && !xw.pointerisvisible)
+		return;
 	MODBIT(xw.attrs.event_mask, set, PointerMotionMask);
 	XChangeWindowAttributes(xw.dpy, xw.win, CWEventMask, &xw.attrs);
 }
@@ -1792,6 +1824,12 @@ kpress(XEvent *ev)
 	Rune c;
 	Status status;
 	Shortcut *bp;
+
+	if (xw.pointerisvisible) {
+		XDefineCursor(xw.dpy, xw.win, xw.bpointer);
+		xsetpointermotion(1);
+		xw.pointerisvisible = 0;
+	}
 
 	if (IS_SET(MODE_KBDLOCK))
 		return;
@@ -2021,6 +2059,59 @@ main(int argc, char *argv[])
 	case 'w':
 		opt_embed = EARGF(usage());
 		break;
+	case 'C': {
+		char* opt_colour = EARGF(usage());
+		struct {
+			char* name;
+			int index;
+		} map[] = {
+			/* WARNING: intentional aliasing */
+			{ "bg", defaultbg },
+			{ "fg", defaultfg },
+			{ "cs", defaultcs },
+			{ "rcs", defaultrcs },
+
+			/*{ "it", defaultitalic },
+			{ "ul", defaultunderline },*/
+
+			/* default colours */
+			{ "black",       0,  },
+			{ "red",         1,  },
+			{ "green",       2,  },
+			{ "yellow",      3,  },
+			{ "blue",        4,  },
+			{ "magenta",     5,  },
+			{ "cyan",        6,  },
+			{ "gray",        7,  },
+			{ "boldblack",   8,  },
+			{ "boldred",     9,  },
+			{ "boldgreen",   10, },
+			{ "boldyellow",  11, },
+			{ "boldblue",    12, },
+			{ "boldmagenta", 13, },
+			{ "boldcyan",    14, },
+			{ "boldgray",    15, },
+		};
+		char* colon = strchr(opt_colour, ':');
+		if(!colon) {
+			if (!apply_color_scheme(opt_colour))
+				usage();
+		} else {
+			for(int i=0; i<LEN(map); i++)
+				if(!strncmp(map[i].name, opt_colour, colon-opt_colour)) {
+					colorname[map[i].index] = colon+1;
+					goto kludge;
+				}
+			char* endptr;
+			int number = strtoul(opt_colour, &endptr, 0);
+			if(endptr < colon || number > LEN(colorname))
+				usage();
+			else
+				colorname[number] = colon+1;
+		}
+kludge:
+		break;
+	}
 	case 'v':
 		die("%s " VERSION "\n", argv0);
 		break;
@@ -2043,6 +2134,7 @@ run:
 	xinit(cols, rows);
 	xsetenv();
 	selinit();
+	apply_color_scheme(default_colorname);
 	run();
 
 	return 0;

@@ -6,6 +6,8 @@ st \- simple terminal
 .RB [ \-aiv ]
 .RB [ \-c
 .IR class ]
+.RB [ \-C
+.IR oldcolor:newcolor ]
 .RB [ \-f
 .IR font ]
 .RB [ \-g
@@ -57,6 +59,24 @@ disables alternate screens in terminal
 .TP
 .BI \-c " class"
 defines the window class (default $TERM).
+.TP
+.BI \-C " oldcolor:newcolor"
+maps
+.I oldcolor
+to \fI newcolor\fR.
+.I oldcolor
+can be: a number from 0 to 255,
+the name for one of the standard 16 colors (e.g., red or boldred),
+.I fg
+(foreground color),
+.I bg
+(background color),
+.I cs
+(cursor color),
+.IP
+.I newcolor
+must be understood by
+.BR XParseColor(3).
 .TP
 .BI \-f " font"
 defines the
