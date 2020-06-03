@@ -253,8 +253,8 @@ static const color_schemes[] = {
 			"#3E999F",
 			"#F5F5F5",
 
-			[defaultbg] = "#EEEEEE",
 			[defaultfg] = "#4D4D4C",
+			[defaultbg] = "#EEEEEE",
 		},
 	},
 	{
@@ -278,8 +278,8 @@ static const color_schemes[] = {
 			"#93a1a1",
 			"#fdf6e3",
 
-			[defaultbg] = "#002b36",
 			[defaultfg] = "#839496",
+			[defaultbg] = "#002b36",
 			[defaultcs] = "#93a1a1",
 		},
 	},
@@ -330,8 +330,8 @@ static const color_schemes[] = {
 			"#dfaf8f",
 			"#efefef",
 
-			[defaultunderline] = "#ccdc90",
-			[defaultitalic] = "#80d4aa",
+			/* [defaultunderline] = "#ccdc90",
+			[defaultitalic] = "#80d4aa", */
 
 			[defaultfg] = "#dcdccc",
 			[defaultbg] = "#1f1f1f",
